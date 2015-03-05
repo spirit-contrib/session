@@ -15,5 +15,5 @@ var (
 	ERR_SESSION_GET_COOKIE_ID_FAILED    = errors.TN(SESSION_ERROR_NS, 4, "get get cookies id failed, raw error is: {{.err}}")
 	ERR_SESSION_NAME_IS_EMPTY           = errors.TN(SESSION_ERROR_NS, 5, "session name is empty")
 	ERR_SESSION_GET_DATA_FAILED         = errors.TN(SESSION_ERROR_NS, 6, "get session data failed")
-	ERR_COOKIES_GET_NAME_FAILED         = errors.TN(SESSION_ERROR_NS, 7, "get cookies name list faild")
+	ERR_COOKIES_GET_NAME_FAILED         = errors.TN(SESSION_ERROR_NS, 7, "get cookies name list faild: {{.err}}")
 )

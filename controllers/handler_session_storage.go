@@ -100,19 +100,22 @@ func (p *SessionStorage) SetSession(msg *spirit.Payload) (result interface{}, er
 }
 
 func (p *SessionStorage) GetSession(msg *spirit.Payload) (result interface{}, err error) {
-	queryCookieNames := []string{}
+	var query struct {
+		CookieNames []string `json:"cookie_names"`
+	}
 
 	values := map[string]interface{}{}
 
-	if e := msg.FillContentToObject(&queryCookieNames); e != nil {
+	if e := msg.FillContentToObject(&query); e != nil {
 		err = errorcode.ERR_COOKIES_GET_NAME_FAILED.New(errors.Params{"err": e})
 		return
 	} else {
 		cookies := map[string]string{}
+
 		msg.GetContextObject(inlet_http.CTX_HTTP_COOKIES, &cookies)
 
 		keyMap := map[string]string{}
-		for _, queryName := range queryCookieNames {
+		for _, queryName := range query.CookieNames {
 			if sid, exist := cookies[queryName]; exist {
 				values[sid] = &map[string]interface{}{}
 				keyMap[sid] = queryName
