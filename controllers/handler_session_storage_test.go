@@ -128,7 +128,7 @@ func TestSessionQuery(t *testing.T) {
 
 				msg.SetContext(inlet_http.CTX_HTTP_COOKIES, ctxCookies)
 
-				msg.SetContent([]string{"sid1"})
+				msg.SetContent(map[string][]string{"cookie_names": []string{"sid1"}})
 
 				result, err := sessionStorage.GetSession(&msg)
 				So(err, ShouldBeNil)
