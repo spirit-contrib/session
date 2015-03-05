@@ -2,6 +2,7 @@
 *.o
 *.a
 *.so
+session
 
 # Folders
 _obj
