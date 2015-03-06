@@ -74,12 +74,14 @@ func (p *SessionStorage) SetSession(msg *spirit.Payload) (result interface{}, er
 					HttpOnly: true,
 				}
 
-				logs.Debug("set new cookie for seesion id:", userCookieId)
+				logs.Debug("set new cookie for session id:", userCookieId)
 				msg.AppendCommand(inlet_http.CMD_HTTP_COOKIES_SET, newCookie)
 			} else {
 				userCookieId = cookieId
 			}
-			p.storage.SetObject(userCookieId, sObj.Value)
+			if e := p.storage.SetObject(userCookieId, sObj.Value); e != nil {
+				logs.Error(e)
+			}
 		}
 	}
 
