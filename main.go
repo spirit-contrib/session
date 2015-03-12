@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"strings"
 
@@ -21,30 +22,44 @@ type MemcachedConfig struct {
 }
 
 func main() {
-	logs.SetFileLogger("./logs/session.log")
 
-	storageAddr := ""
-	if bFile, e := ioutil.ReadFile("./conf/session.conf"); e != nil {
-		panic(e)
-	} else {
-		sessionConfig := SessionConfig{}
-		if e := json.Unmarshal(bFile, &sessionConfig); e != nil {
-			panic(e)
+	sessionStorage := new(controllers.SessionStorage)
+
+	funcInitalSession := func(configFile string) (err error) {
+		logs.SetFileLogger("./logs/session.log")
+
+		if configFile == "" {
+			configFile = "./conf/session.conf"
 		}
 
-		sessionConfig.Address = strings.TrimSpace(sessionConfig.Address)
-		if sessionConfig.Address == "" {
-			panic("memcached.address is empty")
+		storageAddr := ""
+		if bFile, e := ioutil.ReadFile(configFile); e != nil {
+			err = e
+			return
+		} else {
+			sessionConfig := SessionConfig{}
+			if e := json.Unmarshal(bFile, &sessionConfig); e != nil {
+				err = e
+				return
+			}
+
+			sessionConfig.Address = strings.TrimSpace(sessionConfig.Address)
+			if sessionConfig.Address == "" {
+				err = errors.New("memcached.address is empty")
+				return
+			}
+
+			storageAddr = sessionConfig.Address
 		}
 
-		storageAddr = sessionConfig.Address
-	}
+		if storage, e := cache_storages.NewMemcachedStorage(storageAddr); e != nil {
+			err = e
+			return
+		} else {
+			sessionStorage.SetStorage(storage)
+		}
 
-	var sessionStorage *controllers.SessionStorage
-	if storage, e := cache_storages.NewMemcachedStorage(storageAddr); e != nil {
-		panic(e)
-	} else {
-		sessionStorage = controllers.NewSessionStorage(storage)
+		return
 	}
 
 	sessionSpirit := spirit.NewClassicSpirit("session", "a basic session component", "1.0.0")
@@ -53,5 +68,5 @@ func main() {
 	sessionComponent.RegisterHandler("set_session", sessionStorage.SetSession)
 	sessionComponent.RegisterHandler("get_session", sessionStorage.GetSession)
 
-	sessionSpirit.Hosting(sessionComponent).Build().Run()
+	sessionSpirit.Hosting(sessionComponent).Build().Run(funcInitalSession)
 }

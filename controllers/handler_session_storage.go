@@ -27,6 +27,11 @@ func NewSessionStorage(storage cache_storages.CacheStorage) *SessionStorage {
 	return newStorage
 }
 
+func (p *SessionStorage) SetStorage(storage cache_storages.CacheStorage) *SessionStorage {
+	p.storage = storage
+	return p
+}
+
 func (p *SessionStorage) SetSession(msg *spirit.Payload) (result interface{}, err error) {
 	result = msg.GetContent()
 
