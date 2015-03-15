@@ -1,0 +1,13 @@
+session:
+  build: .
+  environment:
+   - SPIRIT_ENV=./conf/spirit.env
+  volumes:
+   - conf/:conf/
+  command: session run --name session -a 'session.set-session|set_session|mqs|{{.access_key_id}}:{{.acces_key_secert}}@http://{{.owner_id}}.{{.mqs_url}}/{{.queue_set_session}}' -a 'session.get-session|get_session|mqs|{{.access_key_id}}:{{.acces_key_secert}}@http://{{.owner_id}}.{{.mqs_url}}/{{.queue_get_session}}'
+  restart: always
+  links:
+  - memcached
+memcached:
+ image: memcached
+ restart: always
