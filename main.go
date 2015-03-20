@@ -1,16 +1,20 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"strings"
 
 	"github.com/gogap/cache_storages"
+	"github.com/gogap/env_json"
 	"github.com/gogap/logs"
 	"github.com/gogap/spirit"
 
 	"github.com/spirit-contrib/session/controllers"
+)
+
+const (
+	SESSION_ENV = "SESSION_ENV"
 )
 
 type SessionConfig struct {
@@ -38,7 +42,8 @@ func main() {
 			return
 		} else {
 			sessionConfig := SessionConfig{}
-			if e := json.Unmarshal(bFile, &sessionConfig); e != nil {
+			envJson := env_json.NewEnvJson(SESSION_ENV, env_json.ENV_JSON_EXT)
+			if e := envJson.Unmarshal(bFile, &sessionConfig); e != nil {
 				err = e
 				return
 			}
