@@ -75,8 +75,8 @@ func TestSessionSet(t *testing.T) {
 	Convey("CMD_SESSION_DELETE command test", t, func() {
 		Convey("input correct params, SEESION_KEY not exist before", func() {
 			Convey("delete SESSION correct", func() {
-				sessionStorage.storage.Set("111-111-111", "hello")
-				sessionStorage.storage.Set("111-111-222", "world")
+				sessionStorage.storage.Set("111-111-111", "hello", 0)
+				sessionStorage.storage.Set("111-111-222", "world", 0)
 
 				msg := spirit.Payload{}
 
@@ -117,7 +117,7 @@ func TestSessionQuery(t *testing.T) {
 	}
 
 	jsonV := `{"v":{"email":"xujinzheng@gmail.com","name":"xujinzheng"}}`
-	sessionStorage.storage.Set("1768f16e-0f33-4e19-58df-0074cbb5376f", jsonV)
+	sessionStorage.storage.Set("1768f16e-0f33-4e19-58df-0074cbb5376f", jsonV, 0)
 
 	Convey("send payload message to query cache", t, func() {
 		Convey("input correct params, SEESION_KEY already exist before", func() {

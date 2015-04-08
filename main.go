@@ -18,11 +18,16 @@ const (
 )
 
 type SessionConfig struct {
-	MemcachedConfig `json:"memcached"`
+	MemcachedConfig MemcachedConfig `json:"memcached"`
+	SessionConf     SessionConf     `json:"session"`
 }
 
 type MemcachedConfig struct {
 	Address string `json:"address"`
+}
+
+type SessionConf struct {
+	ExpirationSeconds int32 `json:"expiration_seconds"`
 }
 
 func main() {
@@ -48,13 +53,21 @@ func main() {
 				return
 			}
 
-			sessionConfig.Address = strings.TrimSpace(sessionConfig.Address)
-			if sessionConfig.Address == "" {
+			sessionConfig.MemcachedConfig.Address = strings.TrimSpace(sessionConfig.MemcachedConfig.Address)
+			if sessionConfig.MemcachedConfig.Address == "" {
 				err = errors.New("memcached.address is empty")
 				return
 			}
 
-			storageAddr = sessionConfig.Address
+			if sessionConfig.SessionConf.ExpirationSeconds < 0 {
+				sessionConfig.SessionConf.ExpirationSeconds = 0
+			}
+
+			sessionStorage.SetExpireSeconds(sessionConfig.SessionConf.ExpirationSeconds)
+
+			logs.Info("session expire seconds:", sessionConfig.SessionConf.ExpirationSeconds)
+
+			storageAddr = sessionConfig.MemcachedConfig.Address
 		}
 
 		if storage, e := cache_storages.NewMemcachedStorage(storageAddr); e != nil {

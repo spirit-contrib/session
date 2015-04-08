@@ -17,14 +17,24 @@ import (
 )
 
 type SessionStorage struct {
-	serverSalt string
-	storage    cache_storages.CacheStorage
+	serverSalt    string
+	storage       cache_storages.CacheStorage
+	expireSeconds int32
 }
 
 func NewSessionStorage(storage cache_storages.CacheStorage) *SessionStorage {
 	newStorage := new(SessionStorage)
 	newStorage.storage = storage
+	newStorage.expireSeconds = 0
 	return newStorage
+}
+
+func (p *SessionStorage) SetExpireSeconds(seconds int32) {
+	if seconds < 0 {
+		p.expireSeconds = 0
+		return
+	}
+	p.expireSeconds = seconds
 }
 
 func (p *SessionStorage) SetStorage(storage cache_storages.CacheStorage) *SessionStorage {
@@ -84,7 +94,7 @@ func (p *SessionStorage) SetSession(msg *spirit.Payload) (result interface{}, er
 			} else {
 				userCookieId = cookieId
 			}
-			if e := p.storage.SetObject(userCookieId, sObj.Value); e != nil {
+			if e := p.storage.SetObject(userCookieId, sObj.Value, p.expireSeconds); e != nil {
 				logs.Error(e)
 			}
 		}

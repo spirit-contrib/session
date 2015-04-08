@@ -1,5 +1,8 @@
 {
 	"memcached":{
 		"address":"memcached:11211"
+	},
+	"session":{
+		"expiration_seconds": 3600
 	}
 }
