@@ -149,6 +149,12 @@ func (p *SessionStorage) GetSession(msg *spirit.Payload) (result interface{}, er
 		for sid, value := range values {
 			name, _ := keyMap[sid]
 			ret[name] = value
+			if p.expireSeconds > 0 {
+				e := p.storage.Touch(sid, p.expireSeconds)
+				if e != nil {
+					logs.Error(e)
+				}
+			}
 		}
 		result = ret
 	}
