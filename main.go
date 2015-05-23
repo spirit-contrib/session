@@ -34,15 +34,11 @@ func main() {
 
 	sessionStorage := new(controllers.SessionStorage)
 
-	funcInitalSession := func(configFile string) (err error) {
-		logs.SetFileLogger("./logs/session.log")
-
-		if configFile == "" {
-			configFile = "./conf/session.conf"
-		}
+	funcInitalSession := func() (err error) {
+		logs.SetFileLogger("logs/session.log")
 
 		storageAddr := ""
-		if bFile, e := ioutil.ReadFile(configFile); e != nil {
+		if bFile, e := ioutil.ReadFile("conf/session.conf"); e != nil {
 			err = e
 			return
 		} else {
@@ -80,11 +76,18 @@ func main() {
 		return
 	}
 
-	sessionSpirit := spirit.NewClassicSpirit("session", "a basic session component", "1.0.0")
+	sessionSpirit := spirit.NewClassicSpirit(
+		"session",
+		"a basic session component",
+		"1.0.0",
+		[]spirit.Author{
+			{Name: "zeal", Email: "xujinzheng@gmail.com"},
+		})
+
 	sessionComponent := spirit.NewBaseComponent("session")
 
 	sessionComponent.RegisterHandler("set_session", sessionStorage.SetSession)
 	sessionComponent.RegisterHandler("get_session", sessionStorage.GetSession)
 
-	sessionSpirit.Hosting(sessionComponent).Build().Run(funcInitalSession)
+	sessionSpirit.Hosting(sessionComponent, funcInitalSession).Build().Run()
 }
